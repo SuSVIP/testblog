@@ -1,0 +1,31 @@
+name: Hugo Build and Deploy
+
+on:
+  push:
+    branches: [ main ]  # 你的主分支名，如果是master就改成master
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu‑latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: true  # 必须开启，拉取PaperMod主题子模块
+          fetch‑depth: 0
+
+      - name: Setup Hugo
+        uses: peaceiris/actions‑hugo‑setup@v4
+        with:
+          hugo‑version: 0.140.2  # 和你本地hugo版本尽量接近
+
+      - name: Build Hugo
+        run: hugo --minify
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions‑gh‑pages@v4
+        if: github.event_name == 'push'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
